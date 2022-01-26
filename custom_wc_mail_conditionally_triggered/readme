@@ -1,1 +1,13 @@
-In progress
+Upload custom-emails folder to wp-content/uploads folder and edit class-tracking-number-email.php and email-functions.php as needed.
+Upload tracking-email.php to wp-content/plugins/woocommerce/templates/emails and edit the email template as needed
+Copy wordpress_fuctions.php content to your wordpress theme functions.php and read the comments
+
+
+ The process to this mail being triggered is the following:
+-Create email class and a conditional check to a custom field value
+-Create a new "Shipped" order status and automatically set order status to it when custom field value is set
+-Send custom email when order status is on shipped
+-Set order status back to processing so another integrations can continue handling it
+
+
+Any updates or improvments are welcome!
