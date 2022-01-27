@@ -52,44 +52,47 @@ $email_notifications['WC_Email_Customer_Tracking_Number']->trigger( $order_id );
 }
 
 
-//Change order status to trigger email and set it back to processing so DL can continue order status processes with a cron
 add_filter( 'cron_schedules', 'custom_cron_10min' );
-function custom_cron_10min( $schedules ) {
-$schedules['ten_minutes'] = array(
-'interval' => 600,
-'display' => esc_html__( 'Every Ten Minutes' ), );
-return $schedules;
+function custom_cron_10min( $schedules ) { 
+    $schedules['ten_minutes'] = array(
+        'interval' => 600,
+        'display'  => esc_html__( 'Every Ten Minutes' ), );
+    return $schedules;
 }
 add_action( 'trigger_cron', 'trigger_cron_exec' );
 //Schedule the action hook using the WP Cron we setup above.
 
 if ( ! wp_next_scheduled( 'trigger_cron' ) ) {
-wp_schedule_event( time(), 'ten_minutes', 'trigger_cron' );
+    wp_schedule_event( time(), 'ten_minutes', 'trigger_cron' );
 }
 // Create the function that is called in your hook.
 
 function trigger_cron_exec() {
+	
+	
+	$orders = wc_get_orders( array('numberposts' => -1) );
 
-
-$orders = wc_get_orders( array('numberposts' => -1) );
-
-// Loop through each WC_Order object
-foreach( $orders as $order ){
-$id = $order->get_id();
-
-$custom_field = get_post_meta($id, 'dlinfo', true);
-//var_dump($custom_field);
-if ($custom_field != '' || $custom_field != null ) {
-$order->update_status( 'shipped' );
-
+	// Loop through each WC_Order object
+	foreach( $orders as $order ){
+  	$id = $order->get_id(); 
+	// update_post_meta ( $id, 'dlinfo', '321' ); - used for testing
+	$custom_field = get_post_meta($id, 'dlinfo', true);
+	$order_status  = $order->get_status();
+	//var_dump($custom_field);
+	if ($custom_field != '' || $custom_field != null && $order_status == 'processing' ) {
+    $order->update_status( 'shipped' );
+			
+	}
 }
+	
+	foreach( $orders as $order ){
+ 	 
+		$id = $order->get_id(); 
+		$order_status  = $order->get_status();
+		$mail_sent = get_post_meta($id, '_tracking_email_sent', true);
+		if (  $order_status == 'shipped' && $mail_sent == 1  ) {
+			$order->update_status( 'processing' );
+		}
+	}
 }
 
-foreach( $orders as $order ){
-$id = $order->get_id();
-if ( get_post_meta($id, '_tracking_email_sent', true)) {
-$order->update_status( 'processing' );
-}
-}
-
-}
