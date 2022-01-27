@@ -75,11 +75,12 @@ function trigger_cron_exec() {
 	// Loop through each WC_Order object
 	foreach( $orders as $order ){
   	$id = $order->get_id(); 
-	// update_post_meta ( $id, 'dlinfo', '321' ); - used for testing
+ 	//update_post_meta ( $id, 'dlinfo', '321' ); 
 	$custom_field = get_post_meta($id, 'dlinfo', true);
 	$order_status  = $order->get_status();
+	$mail_sent = get_post_meta($id, '_tracking_email_sent', true);
 	//var_dump($custom_field);
-	if ($custom_field != '' || $custom_field != null && $order_status == 'processing' ) {
+	if ( $order_status == 'processing' && $custom_field != '' && $mail_sent !== '1' ) {
     $order->update_status( 'shipped' );
 			
 	}
@@ -90,9 +91,11 @@ function trigger_cron_exec() {
 		$id = $order->get_id(); 
 		$order_status  = $order->get_status();
 		$mail_sent = get_post_meta($id, '_tracking_email_sent', true);
-		if (  $order_status == 'shipped' && $mail_sent == 1  ) {
+		if (  $order_status == 'shipped' && $mail_sent == '1'  ) {
 			$order->update_status( 'processing' );
 		}
 	}
 }
+
+
 
