@@ -52,6 +52,15 @@ $email_notifications['WC_Email_Customer_Tracking_Number']->trigger( $order_id );
 }
 
 
+
+
+
+
+
+
+
+
+//Change order status to trigger email and set it back to processing so DL(other plugins) can continue order status processes
 add_filter( 'cron_schedules', 'custom_cron_10min' );
 function custom_cron_10min( $schedules ) { 
     $schedules['ten_minutes'] = array(
