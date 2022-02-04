@@ -68,11 +68,11 @@ function custom_cron_10min( $schedules ) {
         'display'  => esc_html__( 'Every Ten Minutes' ), );
     return $schedules;
 }
-add_action( 'trigger_cron', 'trigger_cron_exec' );
+add_action( 'custom_cron_10min', 'trigger_cron_exec' );
 //Schedule the action hook using the WP Cron we setup above.
 
-if ( ! wp_next_scheduled( 'trigger_cron' ) ) {
-    wp_schedule_event( time(), 'ten_minutes', 'trigger_cron' );
+if ( ! wp_next_scheduled( 'custom_cron_10min' ) ) {
+    wp_schedule_event( time(), 'ten_minutes', 'custom_cron_10min' );
 }
 // Create the function that is called in your hook.
 
